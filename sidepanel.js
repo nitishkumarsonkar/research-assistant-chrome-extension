@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('summarizeBtn').addEventListener('click', textSummarize);
+    document.getElementById('explainBtn').addEventListener('click', textExplain);
     // save notes 
     document.getElementById('saveNotesBtn').addEventListener('click', saveNotes);
    
@@ -48,6 +49,44 @@ async function textSummarize() {
     } catch (error) {
         console.error('Error in text summarization:', error);
         alert('An error occurred while summarizing the text');
+    }
+}
+
+async function textExplain() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        
+        if (tab.url.startsWith('chrome://')) {
+            showResult('Explanation is not supported on this page.');
+            return;
+        }
+        
+        const [{result}] = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            function: () => window.getSelection().toString()
+        }); 
+        
+        if (!result) { 
+            showResult('Please select text to explain');
+            return;
+        }
+        
+        const url = 'http://localhost:8080/api/research/process';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: result, operation: 'explain' })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error in text explanation: ${response.status}`);
+        }
+        
+        const text = await response.text();
+        showResult(text.replace(/\n/g, '<br>'));
+    } catch (error) {
+        console.error('Error in text explanation:', error);
+        alert('An error occurred while explaining the text');
     }
 }
 

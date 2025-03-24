@@ -54,7 +54,7 @@ Update the `manifest.json` file to modify:
 1. Clone both repositories:
 ```sh
 git clone https://github.com/nitishkumarsonkar/research-assistant-services.git
-git clone https://github.com/nitishkumarsonkar/research-assistant-chrome-extension
+git clone https://github.com/nitishkumarsonkar/research-assistant-chrome-extension.git
 ```
 
 2. Follow setup instructions in each repository
